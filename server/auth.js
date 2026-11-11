@@ -7,8 +7,12 @@ import { sessionSecret, upsertUser, getUser } from './store.js';
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 // Optional: restrict sign-in to Google Workspace domains, e.g. ALLOWED_DOMAINS=myschool.edu,district.org
 const ALLOWED_DOMAINS = (process.env.ALLOWED_DOMAINS || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
-// Dev login (no Google) exists only so the app can be tried locally before OAuth is configured.
-export const DEV_LOGIN = !GOOGLE_CLIENT_ID && process.env.NODE_ENV !== 'production';
+// Name-only login (no Google). On by default for local development; on a deployed server it must be
+// switched on explicitly with GUEST_LOGIN=true and is meant for short-lived test deployments only:
+// anyone who can reach the site can sign in under any name. GUEST_CODE optionally requires a shared code.
+// It is always off once GOOGLE_CLIENT_ID is set.
+const GUEST_CODE = process.env.GUEST_CODE || '';
+export const DEV_LOGIN = !GOOGLE_CLIENT_ID && (process.env.NODE_ENV !== 'production' || process.env.GUEST_LOGIN === 'true');
 
 const COOKIE = 'ss_session';
 const MAX_AGE = 60 * 60 * 24 * 14; // seconds
@@ -59,7 +63,7 @@ export function requireUser(req, res, next) {
 }
 
 export function authRoutes(app) {
-  app.get('/api/config', (req, res) => res.json({ googleClientId: GOOGLE_CLIENT_ID, devLogin: DEV_LOGIN }));
+  app.get('/api/config', (req, res) => res.json({ googleClientId: GOOGLE_CLIENT_ID, devLogin: DEV_LOGIN, guestCode: DEV_LOGIN && !!GUEST_CODE }));
 
   app.get('/api/auth/me', (req, res) => res.json({ user: userFromRequest(req) }));
 
@@ -82,6 +86,7 @@ export function authRoutes(app) {
 
   app.post('/api/auth/dev', (req, res) => {
     if (!DEV_LOGIN) return res.status(404).json({ error: 'Not found' });
+    if (GUEST_CODE && String(req.body?.code || '') !== GUEST_CODE) return res.status(403).json({ error: 'That access code is not right.' });
     const name = String(req.body?.name || '').trim().slice(0, 40) || 'Dev User';
     const id = 'dev' + crypto.createHash('sha1').update(name.toLowerCase()).digest('hex').slice(0, 12);
     const user = upsertUser({ id, email: `${name.toLowerCase().replace(/\W+/g, '.')}@dev.local`, name, picture: '' });

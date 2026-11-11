@@ -114,7 +114,7 @@ server.listen(PORT, () => {
   console.log(`SmartSpace running at http://localhost:${PORT}  (${PROD ? 'production' : 'development'})`);
   if (!GOOGLE_CLIENT_ID) {
     console.log(DEV_LOGIN
-      ? 'GOOGLE_CLIENT_ID is not set: Google sign-in is off and the local dev login is enabled.'
+      ? 'GOOGLE_CLIENT_ID is not set: Google sign-in is off and name-only guest login is enabled (testing only).'
       : 'GOOGLE_CLIENT_ID is not set: nobody can sign in. Set it and restart.');
   }
 });

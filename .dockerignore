@@ -1,0 +1,7 @@
+node_modules
+dist
+data
+.git
+public/pyodide
+public/blockly-media
+.env

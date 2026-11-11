@@ -46,12 +46,50 @@ GOOGLE_CLIENT_ID=... npm start
 | --- | --- |
 | `GOOGLE_CLIENT_ID` | OAuth client ID. Required in production. |
 | `ALLOWED_DOMAINS` | Optional comma-separated Google Workspace domains allowed to sign in (e.g. `myschool.edu`). |
+| `GUEST_LOGIN` | `true` enables name-only sign-in on a deployed server while no `GOOGLE_CLIENT_ID` is set. Test deployments only: anyone who can reach the site can sign in under any name, including someone else's. |
+| `GUEST_CODE` | Optional shared code required for guest sign-in. |
 | `SESSION_SECRET` | Secret for signing session cookies. Generated and stored in the data folder if unset. |
 | `PORT` | HTTP port (default 3000). |
 | `DATA_DIR` | Where worlds, uploads and accounts are stored (default `./data`). Back this folder up. |
 | `POLY_PIZZA_API_KEY` | Optional. Adds Poly Pizza results to model search (Poly Haven needs no key). |
 
 Serve it over HTTPS in production: browsers only allow VR/AR, and Google sign-in, on secure origins.
+
+## Deploy
+
+SmartSpace is one long-running Node server (HTTP + WebSockets) that keeps its data in a folder, so it needs a
+host that runs containers and offers a persistent disk. Static hosts (GitHub Pages, Netlify) and
+serverless-function hosts will not work. Run a single instance: the collaboration server keeps open worlds in memory.
+
+**Render** (uses `render.yaml`)
+
+The blueprint is set up as a free **test deployment**: sign-in is name-only (no Google) and there is no
+persistent disk, so worlds are wiped whenever the service restarts, redeploys or goes to sleep.
+
+1. In Render choose **New → Blueprint** and pick this repository.
+2. When asked for values, leave `GOOGLE_CLIENT_ID` and `ALLOWED_DOMAINS` empty. Optionally set `GUEST_CODE`
+   to a code your testers must type to get in. Deploy, then open the `https://….onrender.com` URL.
+
+To turn the test deployment into a real one:
+
+1. Create the Google OAuth client (see *Google sign-in* above) with the site URL as an authorized JavaScript
+   origin, and set `GOOGLE_CLIENT_ID` in the service's Environment tab. Guest sign-in switches off automatically.
+2. Remove `GUEST_LOGIN`, change the plan to a paid instance type and enable the disk in `render.yaml`.
+
+**Any Docker host** (Railway, Fly.io, a school server)
+
+```bash
+docker build -t smartspace .
+```
+
+```bash
+docker run -d --name smartspace -p 3000:3000 -v smartspace-data:/data -e GOOGLE_CLIENT_ID=your-client-id smartspace
+```
+
+For a test without Google sign-in, replace `-e GOOGLE_CLIENT_ID=…` with `-e GUEST_LOGIN=true`.
+
+Put it behind HTTPS (the platform's own, or a reverse proxy such as Caddy that forwards WebSockets), mount a
+volume at `/data`, and back that volume up.
 
 ## Devices
 

@@ -1,5 +1,5 @@
 // Sign-in page. Google Sign-In (Google Identity Services) is the only real sign-in method;
-// the name-only form appears just on local development servers with no Google client ID.
+// the name-only form appears on local development servers, and on test deployments that set GUEST_LOGIN=true.
 import { h, toast } from '../ui/dom.js';
 import { api } from '../api.js';
 
@@ -33,9 +33,10 @@ export function loginPage(config, onSignedIn) {
     note.textContent = 'Use your school Google account.';
   } else if (config.devLogin) {
     const name = h('input', { type: 'text', placeholder: 'Your name', 'aria-label': 'Your name', maxLength: 40, required: true });
-    box.append(h('form.row', { onSubmit: async (e) => { e.preventDefault(); try { onSignedIn((await api.devLogin(name.value)).user); } catch (err) { toast(err.message, 'error'); } } },
-      name, h('button.btn.primary', { type: 'submit' }, 'Continue')));
-    note.textContent = 'Development mode: Google sign-in is not configured yet (set GOOGLE_CLIENT_ID), so any name works on this machine.';
+    const code = config.guestCode && h('input', { type: 'text', placeholder: 'Access code', 'aria-label': 'Access code', autocomplete: 'off', required: true });
+    box.append(h('form.guest', { onSubmit: async (e) => { e.preventDefault(); try { onSignedIn((await api.devLogin(name.value, code ? code.value : undefined)).user); } catch (err) { toast(err.message, 'error'); } } },
+      name, code, h('button.btn.primary', { type: 'submit' }, 'Continue')));
+    note.textContent = 'Test mode: Google sign-in is not set up yet, so you sign in with just a name. Use the same name next time to get your worlds back.';
   } else {
     note.textContent = 'Sign-in is not set up on this server yet. Ask your administrator to configure Google sign-in.';
   }
