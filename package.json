@@ -6,7 +6,8 @@
     "dev": "node server/index.js",
     "build": "vite build",
     "start": "NODE_ENV=production node server/index.js",
-    "postinstall": "node scripts/copy-vendor.js"
+    "postinstall": "node scripts/copy-vendor.js",
+    "build:static": "VITE_STATIC=1 vite build"
   },
   "repository": {
     "type": "git",

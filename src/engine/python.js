@@ -1,12 +1,14 @@
 // Python scripting via Pyodide (CPython compiled to WebAssembly), loaded only when a world uses it.
+import { BASE } from '../env.js';
+
 let pyodidePromise = null;
 let sink = null; // where print() output goes for the current world
 
 export function loadPython() {
   pyodidePromise ||= (async () => {
-    const { loadPyodide } = await import(/* @vite-ignore */ `${location.origin}/pyodide/pyodide.mjs`);
+    const { loadPyodide } = await import(/* @vite-ignore */ `${location.origin}${BASE}pyodide/pyodide.mjs`);
     return loadPyodide({
-      indexURL: '/pyodide/',
+      indexURL: `${BASE}pyodide/`,
       stdout: (s) => sink?.('print', s),
       stderr: (s) => sink?.('error', s),
     });
