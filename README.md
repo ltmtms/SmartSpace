@@ -53,6 +53,33 @@ GOOGLE_CLIENT_ID=... npm start
 
 Serve it over HTTPS in production: browsers only allow VR/AR, and Google sign-in, on secure origins.
 
+## Deploy
+
+SmartSpace is one long-running Node server (HTTP + WebSockets) that keeps its data in a folder, so it needs a
+host that runs containers and offers a persistent disk. Static hosts (GitHub Pages, Netlify) and
+serverless-function hosts will not work. Run a single instance: the collaboration server keeps open worlds in memory.
+
+**Render** (uses `render.yaml`)
+
+1. In Render choose **New → Blueprint** and pick this repository. It creates the web service and a 5 GB disk
+   mounted at `/data`. A disk needs a paid instance type.
+2. When asked, leave `GOOGLE_CLIENT_ID` empty for now and deploy. Note the site URL (`https://….onrender.com`).
+3. Create the Google OAuth client (see *Google sign-in* above) with that URL as an authorized JavaScript origin.
+4. Set `GOOGLE_CLIENT_ID` in the service's Environment tab; Render redeploys and sign-in works.
+
+**Any Docker host** (Railway, Fly.io, a school server)
+
+```bash
+docker build -t smartspace .
+```
+
+```bash
+docker run -d --name smartspace -p 3000:3000 -v smartspace-data:/data -e GOOGLE_CLIENT_ID=your-client-id smartspace
+```
+
+Put it behind HTTPS (the platform's own, or a reverse proxy such as Caddy that forwards WebSockets), mount a
+volume at `/data`, and back that volume up.
+
 ## Devices
 
 | Device | How |

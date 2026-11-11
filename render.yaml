@@ -1,0 +1,19 @@
+# Render blueprint: https://render.com/docs/blueprint-spec
+# A persistent disk requires a paid instance type; worlds and uploads live on it.
+services:
+  - type: web
+    name: smartspace
+    runtime: docker
+    plan: starter
+    healthCheckPath: /api/config
+    disk:
+      name: smartspace-data
+      mountPath: /data
+      sizeGB: 5
+    envVars:
+      - key: GOOGLE_CLIENT_ID
+        sync: false # set in the Render dashboard
+      - key: ALLOWED_DOMAINS
+        sync: false # optional, e.g. myschool.edu
+      - key: SESSION_SECRET
+        generateValue: true
