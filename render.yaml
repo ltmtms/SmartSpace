@@ -1,18 +1,28 @@
 # Render blueprint: https://render.com/docs/blueprint-spec
-# A persistent disk requires a paid instance type; worlds and uploads live on it.
+#
+# As written this is a free TEST deployment:
+#   - name-only guest sign-in (no Google), so anyone with the link can get in
+#   - no persistent disk, so worlds are wiped whenever the service restarts, redeploys or sleeps
+#
+# For real use: set GOOGLE_CLIENT_ID, remove GUEST_LOGIN, change the plan to "starter" (or higher)
+# and uncomment the disk below so worlds and uploads are kept.
 services:
   - type: web
     name: smartspace
     runtime: docker
-    plan: starter
+    plan: free
     healthCheckPath: /api/config
-    disk:
-      name: smartspace-data
-      mountPath: /data
-      sizeGB: 5
+    # disk:
+    #   name: smartspace-data
+    #   mountPath: /data
+    #   sizeGB: 5
     envVars:
+      - key: GUEST_LOGIN
+        value: "true"
+      - key: GUEST_CODE
+        sync: false # optional: a shared code testers must type to sign in
       - key: GOOGLE_CLIENT_ID
-        sync: false # set in the Render dashboard
+        sync: false # leave empty while testing
       - key: ALLOWED_DOMAINS
         sync: false # optional, e.g. myschool.edu
       - key: SESSION_SECRET

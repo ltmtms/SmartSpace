@@ -65,6 +65,8 @@ input[type='checkbox'], input[type='radio'] { accent-color: var(--accent); width
 .features p { color: var(--muted); }
 .signin { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; box-shadow: var(--shadow); display: grid; gap: 14px; }
 .google-btn:empty { display: none; }
+.guest { display: flex; gap: 8px; flex-wrap: wrap; }
+.guest input { flex: 1 1 140px; }
 @media (max-width: 760px) { .login { grid-template-columns: 1fr; gap: 28px; } }
 
 /* ---------- dashboard ---------- */
