@@ -1,4 +1,7 @@
-// Thin wrapper around the server's JSON API.
+// Thin wrapper around the server's JSON API (or, in the static build, around browser storage).
+import { STATIC } from './env.js';
+import { localApi } from './localStore.js';
+
 async function request(method, url, body, raw) {
   const init = { method, headers: {}, credentials: 'same-origin' };
   if (raw) { init.body = raw.body; if (raw.type) init.headers['Content-Type'] = raw.type; } else if (body !== undefined) { init.headers['Content-Type'] = 'application/json'; init.body = JSON.stringify(body); }
@@ -13,7 +16,7 @@ async function request(method, url, body, raw) {
   return data;
 }
 
-export const api = {
+const serverApi = {
   config: () => request('GET', '/api/config'),
   me: () => request('GET', '/api/auth/me'),
   googleLogin: (credential) => request('POST', '/api/auth/google', { credential }),
@@ -34,6 +37,10 @@ export const api = {
   },
   searchModels: (q) => request('GET', `/api/search/models?q=${encodeURIComponent(q)}`),
   polyHavenUrl: (id) => request('GET', `/api/search/polyhaven/${encodeURIComponent(id)}`),
+  prepareAssets: async () => {},
+  thumbUrl: (w) => `/api/worlds/${w.id}/thumbnail?t=${w.updatedAt}`,
   assetUrl: (worldId, file) => `/api/worlds/${worldId}/assets/${file}`,
   proxyUrl: (url) => `/api/search/proxy?url=${encodeURIComponent(url)}`,
 };
+
+export const api = STATIC ? localApi : serverApi;

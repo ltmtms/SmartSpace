@@ -2,6 +2,7 @@
 // the name-only form appears on local development servers, and on test deployments that set GUEST_LOGIN=true.
 import { h, toast } from '../ui/dom.js';
 import { api } from '../api.js';
+import { BASE } from '../env.js';
 
 function loadGoogle() {
   return new Promise((resolve, reject) => {
@@ -44,7 +45,7 @@ export function loginPage(config, onSignedIn) {
   const feature = (icon, title, text) => h('li', null, h('span.glyph', null, icon), h('div', null, h('strong', null, title), h('p', null, text)));
   return h('div.login', null,
     h('div.hero', null,
-      h('div.brand', null, h('img', { src: '/icon.svg', alt: '', width: 44, height: 44 }), h('h1', null, 'SmartSpace')),
+      h('div.brand', null, h('img', { src: `${BASE}icon.svg`, alt: '', width: 44, height: 44 }), h('h1', null, 'SmartSpace')),
       h('p.tagline', null, 'Build your own 3D worlds, bring them to life with code, and step inside them in VR and AR.'),
       h('ul.features', null,
         feature('🧱', 'Build', 'Drag in shapes, characters, buildings and your own models. Sculpt hills and valleys.'),

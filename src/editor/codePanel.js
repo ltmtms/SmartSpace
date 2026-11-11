@@ -2,6 +2,7 @@
 // Blocks compile to both languages, so a learner can switch to text and keep going from the same program.
 import { h, clear, toast, debounce } from '../ui/dom.js';
 import { LOCAL } from '../collab/doc.js';
+import { BASE } from '../env.js';
 import * as Y from 'yjs';
 
 const HELP = {
@@ -171,7 +172,7 @@ export class CodePanel {
       zoom: { controls: true, wheel: true, startScale: 0.8, maxScale: 1.6, minScale: 0.4 },
       move: { scrollbars: true, drag: true, wheel: false },
       grid: { spacing: 24, length: 2, colour: '#d5d9e0', snap: false },
-      media: '/blockly-media/',
+      media: `${BASE}blockly-media/`,
     });
     this.loadBlocks();
     this.ws.addChangeListener((e) => {

@@ -1,6 +1,7 @@
 // "My worlds": create, open, copy and delete worlds; see worlds shared with you.
 import { h, clear, toast, avatar } from '../ui/dom.js';
 import { api } from '../api.js';
+import { STATIC, BASE } from '../env.js';
 
 const ago = (t) => {
   const s = (Date.now() - t) / 1000;
@@ -14,8 +15,8 @@ export function dashboardPage(user, navigate, signOut) {
   const mine = h('div.world-grid'), shared = h('div.world-grid'), sharedWrap = h('section', { hidden: true }, h('h2', null, 'Shared with me'), shared);
 
   const card = (w) => h('article.world-card', null,
-    h('a.thumb', { href: `/world/${w.id}`, 'aria-label': `Open ${w.title}`, onClick: (e) => { e.preventDefault(); navigate(`/world/${w.id}`); } },
-      w.hasThumb ? h('img', { src: `/api/worlds/${w.id}/thumbnail?t=${w.updatedAt}`, alt: '', loading: 'lazy' }) : h('span.glyph', null, '🌍')),
+    h('a.thumb', { href: `${STATIC ? '#' : ''}/world/${w.id}`, 'aria-label': `Open ${w.title}`, onClick: (e) => { e.preventDefault(); navigate(`/world/${w.id}`); } },
+      w.hasThumb ? h('img', { src: api.thumbUrl(w), alt: '', loading: 'lazy' }) : h('span.glyph', null, '🌍')),
     h('div.meta', null,
       h('div', null, h('h3', { title: w.title }, w.title),
         h('p', null, w.isOwner ? `Edited ${ago(w.updatedAt)}` : `By ${w.owner?.name || 'someone'} · ${w.access === 'edit' ? 'can edit' : 'view only'}`)),
@@ -46,9 +47,9 @@ export function dashboardPage(user, navigate, signOut) {
 
   return h('div.dashboard', null,
     h('header.topbar', null,
-      h('div.brand', null, h('img', { src: '/icon.svg', alt: '', width: 28, height: 28 }), h('strong', null, 'SmartSpace')),
+      h('div.brand', null, h('img', { src: `${BASE}icon.svg`, alt: '', width: 28, height: 28 }), h('strong', null, 'SmartSpace')),
       h('span.spacer'),
-      avatar(user, 30), h('span.user-name', null, user.name),
-      h('button.btn', { onClick: signOut }, 'Sign out')),
-    h('main', null, h('section', null, h('h2', null, 'My worlds'), mine), sharedWrap));
+      signOut && [avatar(user, 30), h('span.user-name', null, user.name), h('button.btn', { onClick: signOut }, 'Sign out')]),
+    h('main', null,
+      STATIC && h('p.notice', null, 'Demo version: your worlds are saved only in this browser on this device. Sign-in, sharing and building together need the full SmartSpace server.'), h('section', null, h('h2', null, 'My worlds'), mine), sharedWrap));
 }

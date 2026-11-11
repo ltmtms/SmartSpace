@@ -1,5 +1,6 @@
 import './styles.css';
 import { api } from './api.js';
+import { STATIC, BASE, currentPath, setPath } from './env.js';
 import { h, clear, toast } from './ui/dom.js';
 import { loginPage } from './pages/login.js';
 import { dashboardPage } from './pages/dashboard.js';
@@ -10,7 +11,7 @@ if (import.meta.env.DEV) window.__smartspace = state; // handy in the browser co
 
 /** Client-side routes:  /  (my worlds)   /world/:id  (editor / player) */
 export async function navigate(path, { replace = false } = {}) {
-  if (path !== location.pathname) history[replace ? 'replaceState' : 'pushState'](null, '', path);
+  if (path !== currentPath()) setPath(path, replace);
   await render();
 }
 window.addEventListener('popstate', () => render());
@@ -21,7 +22,7 @@ async function render() {
   state.page = null;
   if (leaving?.close) await leaving.close();
 
-  const path = location.pathname;
+  const path = currentPath();
   if (!state.user) {
     clear(app).append(loginPage(state.config, async (user) => { state.user = user; await render(); }));
     return;
@@ -39,13 +40,13 @@ async function render() {
       state.page = null;
       toast(e.message || 'Could not open that world.', 'error');
       if (e.status === 401) { state.user = null; return render(); }
-      history.replaceState(null, '', '/');
+      setPath('/', true);
       return render();
     }
     return;
   }
-  if (path !== '/') history.replaceState(null, '', '/');
-  clear(app).append(dashboardPage(state.user, navigate, async () => { await api.logout(); state.user = null; await render(); }));
+  if (path !== '/') setPath('/', true);
+  clear(app).append(dashboardPage(state.user, navigate, STATIC ? null : async () => { await api.logout(); state.user = null; await render(); }));
 }
 
 (async function start() {
@@ -53,10 +54,10 @@ async function render() {
     const [config, me] = await Promise.all([api.config(), api.me()]);
     state.config = config;
     state.user = me.user;
-  } catch {
-    clear(app).append(h('div.loading', null, 'SmartSpace could not reach its server. Please reload.'));
+  } catch (e) {
+    clear(app).append(h('div.loading', null, STATIC ? e.message : 'SmartSpace could not reach its server. Please reload.'));
     return;
   }
   await render();
-  if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('/sw.js').catch(() => {});
+  if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register(`${BASE}sw.js`).catch(() => {});
 })();

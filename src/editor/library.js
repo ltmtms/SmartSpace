@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import { h, clear, toast, debounce } from '../ui/dom.js';
 import { api } from '../api.js';
+import { STATIC } from '../env.js';
 import { ASSETS, ASSET_CATEGORIES, buildAsset } from '../engine/assets.js';
 import { PRIMITIVES, buildObject } from '../engine/factory.js';
 import { importFiles, importFromUrl, ACCEPT } from './importer.js';
@@ -100,7 +101,7 @@ export class LibraryPanel {
       section('Import your files', fileInput,
         h('button.btn.wide', { onClick: () => fileInput.click() }, 'Choose files…'),
         h('p.hint', null, '3D models (.glb, .gltf, .obj, .stl), pictures and sounds. You can also drop files onto the world.')),
-      section('Find 3D models', h('form.row', { onSubmit: doSearch }, searchInput, h('button.btn', { type: 'submit' }, 'Search')), this.searchResults,
+      !STATIC && section('Find 3D models', h('form.row', { onSubmit: doSearch }, searchInput, h('button.btn', { type: 'submit' }, 'Search')), this.searchResults,
         h('p.hint', null, 'Free models from Poly Haven and Poly Pizza. Check each model\'s licence before publishing.')));
   }
 
@@ -134,6 +135,6 @@ export class LibraryPanel {
         h('button.icon-btn.small', { title: data.locked ? 'Unlock' : 'Lock (cannot be clicked in the world)', 'aria-label': data.locked ? 'Unlock' : 'Lock', onClick: (e) => { e.stopPropagation(); ed.world.set(id, { locked: !data.locked }); } }, data.locked ? '🔒' : '🔓'),
         h('button.icon-btn.small', { title: data.visible === false ? 'Show' : 'Hide', 'aria-label': data.visible === false ? 'Show' : 'Hide', onClick: (e) => { e.stopPropagation(); ed.world.set(id, { visible: data.visible === false }); } }, data.visible === false ? '◌' : '◉'));
     });
-    clear(this.objectsEl).append(rows.length ? rows : h('p.hint', null, 'Nothing here yet. Add something from the Add tab.'));
+    clear(this.objectsEl).append(...(rows.length ? rows : [h('p.hint', null, 'Nothing here yet. Add something from the Add tab.')]));
   }
 }

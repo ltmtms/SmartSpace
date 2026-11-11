@@ -76,6 +76,23 @@ To turn the test deployment into a real one:
    origin, and set `GOOGLE_CLIENT_ID` in the service's Environment tab. Guest sign-in switches off automatically.
 2. Remove `GUEST_LOGIN`, change the plan to a paid instance type and enable the disk in `render.yaml`.
 
+**GitHub Pages (browser-only demo)**
+
+GitHub Pages can only serve static files, so it cannot run the SmartSpace server. The repository includes a
+second build for it that needs no server: the editor, blocks, JavaScript, Python, physics, file import and
+VR/AR all work, and worlds are saved in the visitor's own browser (IndexedDB) on that device.
+
+Not available in the demo build: sign-in, sharing links, building together in real time, and model search.
+Worlds do not follow a person to another browser or device, and clearing site data deletes them.
+
+One-time setup: repository **Settings → Pages → Source: GitHub Actions**. After that,
+`.github/workflows/pages.yml` publishes the demo to `https://<owner>.github.io/<repo>/` on every push to
+`main` (or run it by hand from the Actions tab). To build it yourself:
+
+```bash
+npm run build:static -- --base=/SmartSpace/
+```
+
 **Any Docker host** (Railway, Fly.io, a school server)
 
 ```bash
@@ -154,6 +171,7 @@ src/
   editor/   Editor, scene sync, library, inspector, code panel, file import
   blocks/   Block definitions and the JavaScript / Python generators
   collab/   Client side of the shared document
+  localStore.js  Browser storage used instead of the server by the static (GitHub Pages) build
   pages/    Sign-in and "My worlds"
 ```
 

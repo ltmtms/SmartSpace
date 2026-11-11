@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import { h, toast, modal, avatar, debounce, clear } from '../ui/dom.js';
 import { api } from '../api.js';
+import { STATIC } from '../env.js';
 import { openWorld } from '../collab/doc.js';
 import { DEFAULT_SETTINGS } from '../../shared/schema.js';
 import { View } from '../engine/view.js';
@@ -42,6 +43,7 @@ export class Editor {
       throw e;
     }
     const { world } = this;
+    await api.prepareAssets(this.meta.id);
     this.view = new View(this.viewportEl);
     this.ctx = { assetUrl: (file) => api.assetUrl(this.meta.id, file) };
     this.sync = new SceneSync(world, this.view, this.ctx);
@@ -150,7 +152,7 @@ export class Editor {
           h('button.icon-btn', { title: 'Undo (Ctrl+Z)', 'aria-label': 'Undo', onClick: () => this.world.undo.undo() }, '↶'),
           h('button.icon-btn', { title: 'Redo (Ctrl+Shift+Z)', 'aria-label': 'Redo', onClick: () => this.world.undo.redo() }, '↷')),
         h('span.spacer'), this.statusEl, this.peopleEl,
-        E && this.meta.isOwner && h('button.btn', { onClick: () => this.shareDialog() }, 'Share'),
+        E && this.meta.isOwner && !STATIC && h('button.btn', { onClick: () => this.shareDialog() }, 'Share'),
         !E && h('button.btn', { onClick: () => this.makeCopy() }, 'Make my own copy'),
         this.vrBtn, this.arBtn, this.playBtn),
       h('div.editor-body', null,
