@@ -1,0 +1,51 @@
+{
+  "name": "smartspace",
+  "version": "1.0.0",
+  "description": "Build, program and explore 3D worlds in the browser, VR and AR.",
+  "scripts": {
+    "dev": "node server/index.js",
+    "build": "vite build",
+    "start": "NODE_ENV=production node server/index.js",
+    "postinstall": "node scripts/copy-vendor.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ltmtms/SmartSpace.git"
+  },
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/ltmtms/SmartSpace/issues"
+  },
+  "homepage": "https://github.com/ltmtms/SmartSpace#readme",
+  "dependencies": {
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-javascript": "^6.2.5",
+    "@codemirror/lang-python": "^6.2.1",
+    "@codemirror/language": "^6.13.1",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/theme-one-dark": "^6.1.3",
+    "@codemirror/view": "^6.43.15",
+    "@dimforge/rapier3d-compat": "^0.21.0",
+    "blockly": "^13.4.0",
+    "codemirror": "^6.0.2",
+    "express": "^5.3.0",
+    "google-auth-library": "^11.3.4",
+    "lib0": "^0.2.120",
+    "multer": "^2.5.0",
+    "pyodide": "^314.0.7",
+    "three": "^0.187.0",
+    "ws": "^8.22.2",
+    "y-codemirror.next": "^0.3.6",
+    "y-protocols": "^1.0.7",
+    "y-websocket": "^3.1.0",
+    "yjs": "^13.6.33"
+  },
+  "devDependencies": {
+    "vite": "^8.3.7"
+  },
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20.11"
+  }
+}
